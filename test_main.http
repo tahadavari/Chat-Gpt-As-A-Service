@@ -1,11 +1,53 @@
-# Test your FastAPI endpoints
+POST http://127.0.0.1:8000/submit
+Content-Type: application/json
+x-token: mysecrettoken
 
-GET http://127.0.0.1:8000/
-Accept: application/json
+{
+  "prompt": "سلام، جهان!"
+}
+
+###
+
+
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "task_id": "123e4567-e89b-12d3-a456-426614174000"
+}
 
 ###
 
-GET http://127.0.0.1:8000/hello/User
-Accept: application/json
+
+
+GET http://127.0.0.1:8000/status/123e4567-e89b-12d3-a456-426614174000
+x-token: mysecrettoken
 
 ###
+
+
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "status": "done"
+}
+
+###
+
+
+
+GET http://127.0.0.1:8000/result/123e4567-e89b-12d3-a456-426614174000
+x-token: mysecrettoken
+
+###
+
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "result": "سلام! امیدوارم حالت خوب باشد."
+}

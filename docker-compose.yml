@@ -1,0 +1,49 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    image: myapp
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - API_TOKEN=${API_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: myworker
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - CELERY_WORKER_CONCURRENCY=${CELERY_WORKER_CONCURRENCY:-4}
+    command: celery -A tasks worker --loglevel=info -c ${CELERY_WORKER_CONCURRENCY}
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin

@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+redis
+celery[redis]
+pydantic
+prometheus-fastapi-instrumentator
+openai
