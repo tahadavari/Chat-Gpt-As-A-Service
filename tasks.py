@@ -24,7 +24,7 @@ def process_task(task_id, prompt):
     r.set(f"status:{task_id}", "running")
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[
                 {"role": "user", "content": prompt}
             ]
