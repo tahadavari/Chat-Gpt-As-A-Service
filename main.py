@@ -20,7 +20,7 @@ celery_app = Celery(
     backend=f'redis://{redis_host}:{redis_port}/{redis_db}'
 )
 
-API_TOKEN = os.getenv('API_TOKEN', 'YOUR_API_TOKEN')
+API_TOKEN = os.getenv('API_TOKEN', 'token')
 
 
 class PromptRequest(BaseModel):
@@ -32,26 +32,27 @@ def get_token_header(x_token: str = Header(...)):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 
-app.state.submitted_tasks = 0
-app.state.successful_tasks = 0
-app.state.failed_tasks = 0
+# app.state.submitted_tasks = 0
+# app.state.successful_tasks = 0
+# app.state.failed_tasks = 0
 
 
 @app.post("/submit", dependencies=[Depends(get_token_header)])
 async def submit_prompt(request: PromptRequest):
     task_id = str(uuid.uuid4())
-    await r.set(f"prompt:{task_id}", request.prompt)
-    await r.set(f"status:{task_id}", "pending")
+    r.set(f"prompt:{task_id}", request.prompt)
+    r.set(f"status:{task_id}", "pending")
     celery_app.send_task('tasks.process_task', args=[task_id, request.prompt])
-    app.state.submitted_tasks += 1
+    # app.state.submitted_tasks += 1
     return {"task_id": task_id}
 
 
 @app.get("/status/{task_id}", dependencies=[Depends(get_token_header)])
 async def get_status(task_id: str):
     status = r.get(f"status:{task_id}")
+    error = r.get(f"error:{task_id}")
     if status:
-        return {"status": status}
+        return {"status": status, "error": error}
     else:
         raise HTTPException(status_code=404, detail="Task not found")
 
