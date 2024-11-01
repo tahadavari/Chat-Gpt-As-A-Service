@@ -19,7 +19,7 @@ x-token: {{token}}
 Accept: application/json
 
 ### Get Result
-GET http://127.0.0.1:8000/result/{{task_id}}
+GET http://{{base_url}}/result/{{task_id}}
 Content-Type: application/json
 x-token: {{token}}
 Accept: application/json
