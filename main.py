@@ -4,7 +4,7 @@ import uuid
 import redis
 from celery import Celery
 from fastapi import FastAPI, HTTPException, Header, Depends
-from prometheus_fastapi_instrumentator import Instrumentator
+# from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -65,7 +65,7 @@ async def get_result(task_id: str):
         raise HTTPException(status_code=404, detail="Result not found")
 
 
-Instrumentator().instrument(app).expose(app)
+# Instrumentator().instrument(app).expose(app)
 
 if __name__ == "__main__":
     import uvicorn
