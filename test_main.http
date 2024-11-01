@@ -1,53 +1,25 @@
-POST http://127.0.0.1:8000/submit
+### Submit Prompt
+POST http://{{base_url}}/submit
 Content-Type: application/json
-x-token: mysecrettoken
+x-token: {{token}}
+Accept: application/json
 
 {
   "prompt": "سلام، جهان!"
 }
 
-###
+> {%
+    client.global.set("task_id", response.body.task_id)
+%}
 
-
-
-HTTP/1.1 200 OK
+### Get Status
+GET http://{{base_url}}//status/{{task_id}}
 Content-Type: application/json
+x-token: {{token}}
+Accept: application/json
 
-{
-  "task_id": "123e4567-e89b-12d3-a456-426614174000"
-}
-
-###
-
-
-
-GET http://127.0.0.1:8000/status/123e4567-e89b-12d3-a456-426614174000
-x-token: mysecrettoken
-
-###
-
-
-
-HTTP/1.1 200 OK
+### Get Result
+GET http://127.0.0.1:8000/result/{{task_id}}
 Content-Type: application/json
-
-{
-  "status": "done"
-}
-
-###
-
-
-
-GET http://127.0.0.1:8000/result/123e4567-e89b-12d3-a456-426614174000
-x-token: mysecrettoken
-
-###
-
-
-HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-  "result": "سلام! امیدوارم حالت خوب باشد."
-}
+x-token: {{token}}
+Accept: application/json
