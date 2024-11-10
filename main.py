@@ -40,8 +40,8 @@ def get_token_header(x_token: str = Header(...)):
 @app.post("/submit", dependencies=[Depends(get_token_header)])
 async def submit_prompt(request: PromptRequest):
     task_id = str(uuid.uuid4())
-    r.set(f"prompt:{task_id}", request.prompt)
-    r.set(f"status:{task_id}", "pending")
+    r.set(f"prompt:{task_id}", request.prompt , ex=300)
+    r.set(f"status:{task_id}", "pending", ex=300)
     celery_app.send_task('tasks.process_task', args=[task_id, request.prompt])
     # app.state.submitted_tasks += 1
     return {"task_id": task_id}
@@ -61,6 +61,9 @@ async def get_status(task_id: str):
 async def get_result(task_id: str):
     result = r.get(f"result:{task_id}")
     if result:
+        r.delete(f"result:{task_id}")
+        r.delete(f"prompt:{task_id}")
+        r.delete(f"status:{task_id}")
         return {"result": result}
     else:
         raise HTTPException(status_code=404, detail="Result not found")
